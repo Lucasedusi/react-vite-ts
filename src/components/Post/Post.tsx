@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 import { format, formatDistanceToNow } from "date-fns";
 
@@ -8,8 +8,25 @@ import { Comment } from "../Comment/Comment";
 import ptBr from "date-fns/locale/pt-BR";
 import styles from "./Post.module.css";
 
-export function Post({ author, content, publishedAt }) {
-	const [comments, setComments] = useState([]);
+interface Author {
+	name: string;
+	rule: string;
+	avatarUrl: string;
+}
+
+interface Content {
+	type: string;
+	content: string;
+}
+
+interface PostProps {
+	author: Author;
+	publishedAt: Date;
+	content: Content[];
+}
+
+export function Post({ author, content, publishedAt }: PostProps) {
+	const [comments, setComments] = useState(["Primeiro comentário"]);
 	const [newCommentText, setNewCommentText] = useState("");
 
 	const publishedDateFormatted = format(
@@ -25,20 +42,20 @@ export function Post({ author, content, publishedAt }) {
 		addSuffix: true,
 	});
 
-	function handleCreateNewComment() {
+	function handleCreateNewComment(event: FormEvent) {
 		event.preventDefault();
 
 		setComments([...comments, newCommentText]);
 		setNewCommentText("");
 	}
 
-	function handleChangeNewComment() {
+	function handleChangeNewComment(event: ChangeEvent<HTMLTextAreaElement>) {
 		const { value } = event.target;
 
 		setNewCommentText(value);
 	}
 
-	function deleteComment(commentToDelete) {
+	function deleteComment(commentToDelete: string) {
 		const removeComment = comments.filter(
 			(comment) => comment !== commentToDelete
 		);
@@ -65,8 +82,8 @@ export function Post({ author, content, publishedAt }) {
 			</header>
 
 			<div className={styles.content}>
-				{content.map((line, index) => {
-					return <p key={index}>{line.content}</p>;
+				{content.map((line) => {
+					return <p key={line.content}>{line.content}</p>;
 				})}
 			</div>
 
